@@ -20,11 +20,11 @@ static void MatrixMultiply_Block(const std::vector<std::vector<int>> &A, int aRo
 // Parallel divide-and-conquer recursive multiply (OpenMP)
 // C += A * B; D is a temporary accumulator matrix
 // -----------------------------------------------------------
-static void pMatrixMultiplyRE(std::vector<std::vector<int>> &A, int aRow, int aCol,
-                              std::vector<std::vector<int>> &B, int bRow, int bCol,
-                              std::vector<std::vector<int>> &C, int cRow, int cCol,
-                              std::vector<std::vector<int>> &D, int dRow, int dCol,
-                              int n)
+static void blockMultiplyRecursive(std::vector<std::vector<int>> &A, int aRow, int aCol,
+                                   std::vector<std::vector<int>> &B, int bRow, int bCol,
+                                   std::vector<std::vector<int>> &C, int cRow, int cCol,
+                                   std::vector<std::vector<int>> &D, int dRow, int dCol,
+                                   int n)
 {
     if (n <= 20)
     {
@@ -34,35 +34,35 @@ static void pMatrixMultiplyRE(std::vector<std::vector<int>> &A, int aRow, int aC
 
     int newSize = n / 2;
 
-    // Use omp task (not taskgroup) to work with the outermost single thread.
-    // Tasks are distributed to worker threads, avoiding nested parallelism explosion.
+    // Use omp task to distribute sub-problems to worker threads.
+    // The outermost call is inside a #pragma omp parallel / single region.
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow, aCol, B, bRow, bCol, C, cRow, cCol, D, dRow, dCol, newSize);
+    blockMultiplyRecursive(A, aRow, aCol, B, bRow, bCol, C, cRow, cCol, D, dRow, dCol, newSize);
 
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow, aCol, B, bRow, bCol + newSize, C, cRow, cCol + newSize, D, dRow, dCol + newSize, newSize);
+    blockMultiplyRecursive(A, aRow, aCol, B, bRow, bCol + newSize, C, cRow, cCol + newSize, D, dRow, dCol + newSize, newSize);
 
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow + newSize, aCol, B, bRow, bCol, C, cRow + newSize, cCol, D, dRow + newSize, dCol, newSize);
+    blockMultiplyRecursive(A, aRow + newSize, aCol, B, bRow, bCol, C, cRow + newSize, cCol, D, dRow + newSize, dCol, newSize);
 
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow + newSize, aCol, B, bRow, bCol + newSize, C, cRow + newSize, cCol + newSize, D, dRow + newSize, dCol + newSize, newSize);
+    blockMultiplyRecursive(A, aRow + newSize, aCol, B, bRow, bCol + newSize, C, cRow + newSize, cCol + newSize, D, dRow + newSize, dCol + newSize, newSize);
 
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow, aCol + newSize, B, bRow + newSize, bCol, D, dRow, dCol, D, dRow, dCol, newSize);
+    blockMultiplyRecursive(A, aRow, aCol + newSize, B, bRow + newSize, bCol, D, dRow, dCol, D, dRow, dCol, newSize);
 
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow, aCol + newSize, B, bRow + newSize, bCol + newSize, D, dRow, dCol + newSize, D, dRow, dCol + newSize, newSize);
+    blockMultiplyRecursive(A, aRow, aCol + newSize, B, bRow + newSize, bCol + newSize, D, dRow, dCol + newSize, D, dRow, dCol + newSize, newSize);
 
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow + newSize, aCol + newSize, B, bRow + newSize, bCol, D, dRow + newSize, dCol, D, dRow + newSize, dCol, newSize);
+    blockMultiplyRecursive(A, aRow + newSize, aCol + newSize, B, bRow + newSize, bCol, D, dRow + newSize, dCol, D, dRow + newSize, dCol, newSize);
 
 #pragma omp task shared(A, B, C, D) firstprivate(aRow, aCol, bRow, bCol, cRow, cCol, dRow, dCol, newSize)
-    pMatrixMultiplyRE(A, aRow + newSize, aCol + newSize, B, bRow + newSize, bCol + newSize, D, dRow + newSize, dCol + newSize, D, dRow + newSize, dCol + newSize, newSize);
+    blockMultiplyRecursive(A, aRow + newSize, aCol + newSize, B, bRow + newSize, bCol + newSize, D, dRow + newSize, dCol + newSize, D, dRow + newSize, dCol + newSize, newSize);
 
 #pragma omp taskwait
 
-    // Serial merge D into C (done by one thread; cost is O(n²) vs O(n³) for multiply)
+    // Serial merge D into C (O(n²) vs O(n³) for multiply)
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < n; ++j)
             C[cRow + i][cCol + j] += D[dRow + i][dCol + j];
@@ -98,7 +98,7 @@ extern void parallelMatrixMultiply(const std::vector<std::vector<int>> &A,
 #pragma omp parallel
     {
 #pragma omp single
-        pMatrixMultiplyRE(
+        blockMultiplyRecursive(
             const_cast<std::vector<std::vector<int>> &>(A), 0, 0,
             const_cast<std::vector<std::vector<int>> &>(B), 0, 0,
             C, 0, 0,
