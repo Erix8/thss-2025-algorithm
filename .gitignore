@@ -60,6 +60,9 @@ __pycache__/
 *.egg
 *.whl
 
+# ========== Generated Test Data ==========
+StringMatching/data/
+
 # ========== Misc ==========
 core
 core.[0-9]*
