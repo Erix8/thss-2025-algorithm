@@ -62,5 +62,5 @@ __pycache__/
 
 # ========== Misc ==========
 core
-core.*
+core.[0-9]*
 *.log
