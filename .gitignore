@@ -1,0 +1,59 @@
+# ========== Build Artifacts (CMake) ==========
+build/
+cmake-build-*/
+out/
+**/CMakeCache.txt
+**/CMakeFiles/
+**/cmake_install.cmake
+**/CTestTestfile.cmake
+**/Makefile
+**/Testing/
+**/install_manifest.txt
+
+# ========== Compiled Binaries / Objects ==========
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.out
+*.mod
+
+# ========== IDE / Editor ==========
+.vscode/
+.idea/
+*.suo
+*.user
+*.sln
+*.vcxproj
+*.vcxproj.*
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.ipch
+
+# ========== macOS ==========
+.DS_Store
+.AppleDouble
+.LSOverride
+*_AppleScript
+*._*
+
+# ========== Windows ==========
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ========== Linux ==========
+*~
+
+# ========== Misc ==========
+core
+core.*
+*.log
