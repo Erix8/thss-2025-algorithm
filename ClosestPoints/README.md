@@ -152,34 +152,34 @@ Time cost: 0.525542ms
 -------------------------------------
 ```
 
-## Benchmark Results
+## Benchmark Results (Apple M-series)
 
-Test data: points in (0, 10000) × (0, 10000), times in ms.
+Points uniformly distributed in (0, 10000) × (0, 10000), times in ms.
 
 ### Brute Force
 
-| n      | 1000    | 5000   | 10000   | 20000   | 30000   | 40000   | 50000   |
-| ------ | ------- | ------ | ------- | ------- | ------- | ------- | ------- |
-| time   | 16.39   | 304.1  | 1054.35 | 4030.95 | 8803.06 | 16530.5 | 25392.1 |
+| n      | 1000    | 5000   | 10000  | 20000  | 30000  | 40000  | 50000  |
+| ------ | ------- | ------ | ------ | ------ | ------ | ------ | ------ |
+| time   | 0.94    | 20.05  | 46.25  | 144.30 | 326.83 | 598.58 | 910.84 |
 
-The runtime grows polynomially (~Θ(n²)), consistent with the theoretical analysis.
+The runtime grows quadratically (~Θ(n²)), consistent with the theoretical analysis. From n=1000 to n=50000 (50× points, 2500× pairs), actual time increases ~969×.
 
 ### Divide and Conquer
 
-| n      | 1000   | 5000   | 10000  | 50000  | 100000 | 500000 | 1000000 | 10000000 |
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------- | -------- |
-| time   | 4.1782 | 6.4362 | 13.7065| 68.418 | 144.641| 655.574| 1656.81 | 19567.7  |
+| n      | 1000   | 5000  | 10000 | 20000 | 30000 | 40000 | 50000  | 100000 | 500000 | 1000000 | 10000000 |
+| ------ | ------ | ----- | ----- | ----- | ----- | ----- | ------ | ------ | ------ | ------- | -------- |
+| time   | 0.08   | 0.38  | 0.52  | 1.04  | 1.62  | 2.41  | 3.23   | 7.70   | 36.40  | 69.96   | 601.01   |
 
-The runtime grows almost linearly (~Θ(n lg n)), consistent with the theoretical analysis.
+The runtime grows near-linearly (~Θ(n lg n)), consistent with the theoretical analysis. From n=1000 to n=10M (10,000× points), actual time increases only ~7,500×.
 
 ### Comparison
 
 | n      | 1000   | 5000   | 10000  | 20000  | 30000  | 50000   |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------- |
-| Brute  | 19.02  | 321.31 | 1523.67| 4224.02| 13747  | 31923.8 |
-| Divide | 2.81   | 5.26   | 9.87   | 16.69  | 32.81  | 69.94   |
+| Brute  | 0.94   | 20.05  | 46.25  | 144.30 | 326.83 | 910.84  |
+| Divide | 0.08   | 0.38   | 0.52   | 1.04   | 1.62   | 3.23    |
 
-For small inputs (n < 10000) both algorithms perform similarly, but for large inputs (n > 10000) the divide-and-conquer algorithm is dramatically faster and clearly the better choice.
+For n=1000, divide-and-conquer is already ~12× faster. By n=50000, the gap widens to ~282×, demonstrating the O(n lg n) vs O(n²) complexity difference. Beyond n=50000, brute force is skipped entirely as it would take excessively long.
 
 ## Timing Measurement
 

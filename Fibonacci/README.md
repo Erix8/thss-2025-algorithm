@@ -63,23 +63,44 @@ Then input a positive integer *n* when prompted:
 input scale n: 43
 Fibonacci Test:43
 --------------------------------------------
-Naive_Recursive: 
+Naive_Recursive:
 Answer: 433494437
-Time cost: 3755.65ms
+Time cost: 688.288ms
 --------------------------------------------
-Botton_Up: 
+Botton_Up:
 Answer: 433494437
-Time cost: 0.0222ms
+Time cost: 0.00075ms
 --------------------------------------------
-Binet_Recursive_Squaring: 
+Binet_Recursive_Squaring:
 Answer: 433494437
-Time cost: 0.0002ms
+Time cost: 0.004333ms
 --------------------------------------------
-Matrix_Recursive_Squaring: 
+Matrix_Recursive_Squaring:
 Answer: 433494437
-Time cost: 0.0047ms
+Time cost: 0.000042ms
 --------------------------------------------
 ```
+
+## Benchmark Results (Apple M-series)
+
+Times in ms:
+
+| n  | Naive_Recursive | Botton_Up | Binet_Recursive_Squaring | Matrix_Recursive_Squaring |
+|----|-----------------|-----------|--------------------------|---------------------------|
+| 30 | 3.88            | 0.00100   | 0.02092                  | 0.00013                   |
+| 35 | 29.17           | 0.00088   | 0.00667                  | 0.00008                   |
+| 40 | 167.70          | 0.00063   | 0.00350                  | 0.00004                   |
+| 43 | 688.29          | 0.00075   | 0.00433                  | 0.00004                   |
+| 45 | /               | 0.00025   | 0.00088                  | 0.00004                   |
+| 90 | /               | 0.00046   | 0.00125                  | 0.00008                   |
+| 92 | /               | 0.00029   | 0.00071                  | 0.00008                   |
+
+### Analysis
+
+- **Naive_Recursive**: Doubles with each increment of n, consistent with Θ(φⁿ). At n=43 it takes 688ms; by n=45 it's already too slow and skipped.
+- **Botton_Up**: Linear Θ(n), extremely fast for practical n.
+- **Binet_Recursive_Squaring**: Θ(lg n), sub-microsecond for large n. However, precision loss is visible at n=90 (answer 2880067194370809856 vs correct 2880067194370816120) and worsens at n=92.
+- **Matrix_Recursive_Squaring**: Θ(lg n) with exact integer results—the best choice when both speed and accuracy matter. At ~0.00004-0.00008ms it's effectively instant.
 
 ### Test Input Constraints
 

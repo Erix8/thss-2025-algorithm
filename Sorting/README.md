@@ -95,43 +95,43 @@ Size of List: 10000
 Data Generating Complete!
 -------------------------------------
 Sorting method: Insertion Sort
-Time cost: 95.1306ms
+Time cost: 9.69975ms
 -------------------------------------
 Sorting method: Shell Sort
-Time cost: 1.85942ms
+Time cost: 0.906333ms
 -------------------------------------
 Sorting method: Quick Sort
-Time cost: 0.895792ms
+Time cost: 0.523ms
 -------------------------------------
 Sorting method: Merge Sort
-Time cost: 2.16754ms
+Time cost: 0.58125ms
 -------------------------------------
 Sorting method: Radix Sort
-Time cost: 1.9975ms
+Time cost: 0.38625ms
 -------------------------------------
 ```
 
 > **Note**: Insertion Sort is skipped for input sizes ≥ 10⁶ and Shell Sort for sizes ≥ 10⁸, as their runtime becomes prohibitive at those scales.
 
-## Benchmark Results
+## Benchmark Results (Apple M-series)
 
 Random 32-bit unsigned integers, times in ms:
 
-| n            | 10     | 10²    | 10³    | 10⁴     | 10⁵     | 10⁶     | 10⁷     | 10⁸      | 2×10⁸    |
-| ------------ | ------ | ------ | ------ | ------- | ------- | ------- | ------- | -------- | -------- |
-| Insertion    | 0.0008 | 0.0219 | 1.0565 | 101.876 | 10256.8 | /       | /       | /        | /        |
-| Shell        | 0.0009 | 0.0126 | 0.1986 | 2.2249  | 33.1433 | 444.859 | 6650.4  | /        | /        |
-| Quick        | 0.0008 | 0.0104 | 0.13   | 1.2388  | 16.7563 | 199.624 | 2390.1  | 26314.1  | 55129.1  |
-| Merge        | 0.0044 | 0.0186 | 0.2453 | 2.2533  | 26.7495 | 300.827 | 3496.64 | 40386.3  | 83601.4  |
-| Radix        | 0.071  | 0.1472 | 0.8805 | 2.3835  | 10.7179 | 82.7209 | 793.431 | 7729.53  | 15248.8  |
+| n            | 10      | 10²     | 10³     | 10⁴     | 10⁵      | 10⁶     | 10⁷      | 10⁸      | 2×10⁸     |
+| ------------ | ------- | ------- | ------- | ------- | -------- | ------- | -------- | -------- | --------- |
+| Insertion    | 0.0004  | 0.0036  | 0.138   | 9.70    | 654.14   | /       | /        | /        | /         |
+| Shell        | 0.0002  | 0.0059  | 0.075   | 0.91    | 7.06     | 87.49   | 1137.05  | /        | /         |
+| Quick        | 0.0003  | 0.0052  | 0.050   | 0.52    | 4.07     | 45.80   | 524.80   | 6045.72  | 12875.0   |
+| Merge        | 0.0011  | 0.0074  | 0.067   | 0.58    | 4.25     | 44.35   | 532.78   | 6068.89  | 13059.5   |
+| Radix        | 0.0113  | 0.0435  | 0.180   | 0.39    | 0.69     | 4.64    | 51.58    | 723.86   | 2291.74   |
 
 ### Analysis
 
-- **Insertion Sort**: fast on tiny inputs, but explodes to ~10 s at n = 10⁵ and cannot finish for n ≥ 10⁶, reflecting its O(n²) complexity. Not suitable for large data.
-- **Shell Sort**: already clearly faster than insertion sort at n = 10³ (0.199 ms vs 1.057 ms). Handles up to 10⁷ but its O(n^1.3~2) growth shows at scale.
-- **Quick Sort**: the fastest comparison-based sort across all scales evaluated; the gentlest growth among all five up to 10⁸, consistent with Θ(n lg n) average complexity.
-- **Merge Sort**: slightly slower than quick sort on small inputs, but its stable Θ(n lg n) behavior makes it predictable and reliable on large datasets.
-- **Radix Sort**: the fastest sort at n ≥ 10⁶ — at 2×10⁸ it takes only ~15 s versus ~55 s for quick sort, demonstrating the advantage of its near-linear time for fixed-width integers.
+- **Insertion Sort**: O(n²) growth is clear. Fast at n=10³ (0.138ms), but jumps to 654ms at n=10⁵. Skipped for n ≥ 10⁶.
+- **Shell Sort**: ~10× faster than insertion at n=10⁵. Its O(n^1.3~2) growth allows it to handle up to 10⁷ (1137ms) before becoming impractical.
+- **Quick Sort**: The fastest comparison-based sort. At 2×10⁸, 12.9s vs Merge's 13.1s—the slight edge comes from in-place operations and better cache locality.
+- **Merge Sort**: Nearly identical to Quick Sort in performance, with predictable Θ(n lg n) behavior and stability guarantees. The consistent performance makes it reliable for any input distribution.
+- **Radix Sort**: Dominates at large scales due to near-linear O(n) time. At n=10⁶, it's 10× faster than Quick/Merge (4.6ms vs ~45ms). At 2×10⁸, 2.3s vs 12.9s—a 5.6× advantage. The bucket overhead makes it slower for tiny inputs (n ≤ 100).
 
 ## Timing Measurement
 
