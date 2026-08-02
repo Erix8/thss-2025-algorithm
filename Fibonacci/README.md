@@ -15,7 +15,7 @@ Fibonacci/
 └── src/
     ├── Fibonacci.h             # Declarations & Matrix class
     ├── Fibonacci.cpp           # Algorithm implementations & timing test
-    └── Fibonacci_Main.cpp      # Main entry: reads n from stdin and runs the test
+    └── main.cpp                # Main entry: reads n from stdin and runs the test
 ```
 
 ## Algorithms

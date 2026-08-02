@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(fibonacci
-    src/Fibonacci_Main.cpp
+    src/main.cpp
     src/Fibonacci.cpp
 )
